@@ -49,6 +49,8 @@ Nanopore_directRNAsequencing/
 │       └── samtools_bcftools/
 │           └── main.nf
 └── results/
+│
+└── work/
 ```
 ## Data Analysis Steps
 1. **Quality Control (FastQC):** 
