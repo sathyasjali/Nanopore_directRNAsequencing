@@ -24,6 +24,7 @@ $ docker pull community.wave.seqera.io/library/samtools:1.21--0d76da7c3cf7751c
 
 ### Folder structure ##
 
+```
 Nanopore_directRNAsequencing/
 ├── README.md
 ├── nextflow.config
@@ -47,7 +48,7 @@ Nanopore_directRNAsequencing/
 │       └── samtools_bcftools/
 │           └── main.nf
 └── results/
-
+```
 ## Data Analysis Steps
 1. **Quality Control (FastQC):** 
     - Perform quality control on raw FASTQ files using FastQC.
