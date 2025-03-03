@@ -26,6 +26,7 @@ $ docker pull community.wave.seqera.io/library/samtools:1.21--0d76da7c3cf7751c
 
 ```
 Nanopore_directRNAsequencing/
+
 ├── README.md
 ├── nextflow.config
 ├── nanopore.nf
