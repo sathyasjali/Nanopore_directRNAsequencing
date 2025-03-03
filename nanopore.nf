@@ -7,6 +7,8 @@ include { NANOFILT } from './modules/qc/nanofilt/main.nf'
 include { MULTIQC } from './modules/qc/multiqc/main.nf'
 include { MINIMAP2 } from './modules/align/minimap2/main.nf'
 include { SAMTOOLS_BCFTOOLS } from './modules/align/samtools_bcftools/main.nf'
+include { SAMTOOLS_INDEX } from './modules/align/samtools_bcftools/main.nf'
+
 
 workflow {
     // creating channels for inputs input
@@ -38,4 +40,9 @@ workflow {
     samtools_bcftools_results = minimap2_results
         .map { tuple(it[0], it[1], it[2]) }  // Ensure correct tuple structure
         | SAMTOOLS_BCFTOOLS
+
+    // Step6: Run Samtools Index
+    samtools_index_results = samtools_bcftools_results
+        .map { tuple(it[0], it[1], reference_ch.first()) }  // Ensure correct tuple structure
+        | SAMTOOLS_INDEX
 }

@@ -20,7 +20,7 @@ $ docker pull community.wave.seqera.io/library/minimap2:2.28--78db3d0b6e5cb797
 $ docker pull community.wave.seqera.io/library/samtools:1.21--0d76da7c3cf7751c
 ```
 4. Now cd to `Nanopore_workflow`
-5. Then run the command 'nextflow run nanopore.nf'
+5. Then run the command `nextflow run nanopore.nf`
 
 
 # Resources
