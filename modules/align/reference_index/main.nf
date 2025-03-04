@@ -1,6 +1,6 @@
 process REFERENCE_INDEX {
     tag "index_ref"
-    publishDir "${params.out_dir}/reference", mode: 'copy'
+    publishDir "${params.out_dir}/reference_index", mode: 'copy'
 
     input:
         path(reference_genome)

@@ -7,7 +7,7 @@ include { NANOFILT } from './modules/qc/nanofilt/main.nf'
 include { MULTIQC } from './modules/qc/multiqc/main.nf'
 include { MINIMAP2 } from './modules/align/minimap2/main.nf'
 include { SAMTOOLS_BCFTOOLS } from './modules/align/samtools_bcftools/main.nf'
-include { SAMTOOLS_INDEX } from './modules/align/samtools_bcftools/main.nf'
+//include { SAMTOOLS_INDEX } from './modules/align/samtools_bcftools/main2.nf'
 include { REFERENCE_INDEX } from './modules/align/reference_index/main.nf'  // NEW: Reference genome indexing
 
 
@@ -18,35 +18,30 @@ workflow {
 
     // Step 1: Index Reference Genome
     indexed_reference_ch = reference_ch | REFERENCE_INDEX
-
-    // Step1: Run FastQC
+    
+    // Step 2: Run FastQC
     fastqc_results = fastq_ch.map { file -> tuple(file.baseName, file) } | FASTQC
 
-    // Step2: Run NanoFilt
+    // Step 3: Run NanoFilt
     nanofilt_results = fastq_ch.map { file -> tuple(file.baseName, file) } | NANOFILT
 
-    // Step3: Run MultiQC
+    // Step 4: Run MultiQC
     multiqc_report = MULTIQC(fastqc_results.map { it[1] }, nanofilt_results.map { it[1] })
-
-    // Step 4: Run Minimap2 with correct channel combination
-    //minimap2_results = nanofilt_results
-    //.map { sample -> tuple(sample[0], sample[1]) }  // Ensure tuples
-    // .combine(reference_ch)  // Use combine instead of cross
-    //| MINIMAP2
-
-    // Step 4: Run Minimap2 with correct channel combination
+    
+    // Step 5: Run Minimap2 with correct channel combination
     minimap2_results = nanofilt_results
         .map { sample -> tuple(sample[0], sample[1]) }  // Ensure tuples
         .combine(reference_ch.map { ref -> tuple(ref) })  // Ensure reference is a tuple
         | MINIMAP2
 
-    // Step 6: Run Samtools and Bcftools
+    // Step 6: Run Samtools/Bcftools
     samtools_bcftools_results = minimap2_results
-        .combine(reference_ch)  // Combine each SAM file with the reference genome
+        .combine(indexed_reference_ch)  // Pair BAM with FASTA
         | SAMTOOLS_BCFTOOLS
 
-    // Step 7: Run Samtools Index
-    samtools_index_results = samtools_bcftools_results
-        .combine(reference_ch)  // Combine BAM output with reference
-        | SAMTOOLS_INDEX
+    // Step 7: Run Samtools Index (correct tuple structure)
+    //samtools_index_results = samtools_bcftools_results
+        //.map { tuple(it[0], it[2]) }  // Pass only sample_id and BAM
+        //.combine(reference_ch.map { tuple(it) }) // Pass reference separately
+        //| SAMTOOLS_INDEX 
 }
