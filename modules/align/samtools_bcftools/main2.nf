@@ -6,9 +6,8 @@ process SAMTOOLS_INDEX {
         tuple val(sample_id), path(sorted_bam), path(reference_genome)
 
     output:
-        path("${sample_id}.bcf")
-        path("${sample_id}.vcf")
-        path("${sample_id}.consensus.fa")
+        path("${sample_id}.mpileup")
+        
 
     script:
     """
@@ -40,13 +39,7 @@ process SAMTOOLS_INDEX {
     fi
 
     # Generate BCF using samtools mpileup and bcftools call
-    samtools mpileup -f "${reference_genome}" "${sorted_bam}" | \
-    bcftools call -mv -Ob -o "${sample_id}.bcf"
-
-    # Convert BCF to VCF
-    bcftools view "${sample_id}.bcf" -Ov -o "${sample_id}.vcf"
-
-    # Generate consensus sequence
-    bcftools consensus -f "${reference_genome}" "${sample_id}.vcf" > "${sample_id}.consensus.fa"
+    samtools mpileup -f "${reference_genome}" "${sorted_bam}" > "${sample_id}.mpileup"
+    
     """
 }

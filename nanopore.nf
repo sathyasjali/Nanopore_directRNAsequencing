@@ -7,7 +7,7 @@ include { NANOFILT } from './modules/qc/nanofilt/main.nf'
 include { MULTIQC } from './modules/qc/multiqc/main.nf'
 include { MINIMAP2 } from './modules/align/minimap2/main.nf'
 include { SAMTOOLS_BCFTOOLS } from './modules/align/samtools_bcftools/main.nf'
-//include { SAMTOOLS_INDEX } from './modules/align/samtools_bcftools/main2.nf'
+include { SAMTOOLS_INDEX } from './modules/align/samtools_bcftools/main2.nf'
 include { REFERENCE_INDEX } from './modules/align/reference_index/main.nf'  // NEW: Reference genome indexing
 
 
@@ -40,8 +40,8 @@ workflow {
         | SAMTOOLS_BCFTOOLS
 
     // Step 7: Run Samtools Index (correct tuple structure)
-    //samtools_index_results = samtools_bcftools_results
-        //.map { tuple(it[0], it[2]) }  // Pass only sample_id and BAM
-        //.combine(reference_ch.map { tuple(it) }) // Pass reference separately
-        //| SAMTOOLS_INDEX 
+    samtools_index_results = samtools_bcftools_results
+        .map { tuple(it[0], it[2]) }  // Pass only sample_id and BAM
+        .combine(reference_ch.map { tuple(it) }) // Pass reference separately
+        | SAMTOOLS_INDEX 
 }
