@@ -7,13 +7,13 @@ process MULTIQC {
 
     input:
         path fastqc_results
-        path nanofilt_results
+        path fastqc_nanofilt_results
 
     output:
         path 'multiqc_report.html'
 
     script:
     """
-    multiqc ${fastqc_results} ${nanofilt_results} -o ./
+    multiqc ${fastqc_results} ${fastqc_nanofilt_results} -o ./
     """
 }
