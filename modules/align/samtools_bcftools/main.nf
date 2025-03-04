@@ -28,7 +28,7 @@ process SAMTOOLS_BCFTOOLS {
 // SAMTOOLS_INDEX process
 process SAMTOOLS_INDEX {
     tag "$sample_id"
-    publishDir "${params.out_dir}/samtools_index", mode: 'copy'
+    publishDir "${params.out_dir}/samtools_bcftools", mode: 'copy'
 
     input:
         tuple val(sample_id), path(sam_file), path(reference_genome)
@@ -41,6 +41,11 @@ process SAMTOOLS_INDEX {
 
     script:
     """
+    # Debugging: Print paths
+    echo "Processing sample: ${sample_id}"
+    echo "SAM file: ${sam_file}"
+    echo "Reference genome: ${reference_genome}"
+    
     # Generate flagstat report
     samtools flagstat '${sam_file}' > '${sam_file.baseName}.txt'
     
