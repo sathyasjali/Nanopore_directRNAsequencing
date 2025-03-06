@@ -1,47 +1,36 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
-//Include modules
+// Include modules
 include { FASTQC } from './modules/qc/fastqc/main.nf'
-include { NANOFILT } from './modules/qc/nanofilt/main.nf'
 include { MULTIQC } from './modules/qc/multiqc/main.nf'
-include { MINIMAP2 } from './modules/align/minimap2/main.nf'
-include { SAMTOOLS_BCFTOOLS } from './modules/align/samtools_bcftools/main.nf'
-include { SAMTOOLS_INDEX } from './modules/align/samtools_bcftools/main2.nf'
-include { REFERENCE_INDEX } from './modules/align/reference_index/main.nf'  // NEW: Reference genome indexing
+
+// Include subworkflows
+include { FASTQC_ANALYSIS } from './modules/qc/fastqc/fastqc_analysis.nf'
+include { MULTIQC_ANALYSIS } from './modules/qc/multiqc/multiqc_analysis.nf'
 
 
 workflow {
-    // creating channels for inputs input
-    fastq_ch = Channel.fromPath("${params.fastq_files}")
-    reference_ch = Channel.fromPath("${params.reference_dir}/*.fa").ifEmpty { error "No reference genome files found in ${params.reference_dir}" }
+    // Creating channels for inputs
+    fastq_ch = Channel.fromPath("${params.fastq_files}").ifEmpty {
+        error "No FASTQ files found in ${params.fastq_files}"
+    }
 
-    // Step 1: Index Reference Genome
-    indexed_reference_ch = reference_ch | REFERENCE_INDEX
-    
-    // Step 2: Run FastQC
-    fastqc_results = fastq_ch.map { file -> tuple(file.baseName, file) } | FASTQC
+    reference_ch = Channel.fromPath("${params.reference_dir}/*.fa").ifEmpty { 
+        error "No reference genome files found in ${params.reference_dir}" 
+    }
 
-    // Step 3: Run NanoFilt
-    nanofilt_results = fastq_ch.map { file -> tuple(file.baseName, file) } | NANOFILT
+    // Run FASTQC analysis
+    FASTQC_ANALYSIS(fastq_ch)
 
-    // Step 4: Run MultiQC
-    multiqc_report = MULTIQC(fastqc_results.map { it[1] }, nanofilt_results.map { it[1] })
-    
-    // Step 5: Run Minimap2 with correct channel combination
-    minimap2_results = nanofilt_results
-        .map { sample -> tuple(sample[0], sample[1]) }  // Ensure tuples
-        .combine(reference_ch.map { ref -> tuple(ref) })  // Ensure reference is a tuple
-        | MINIMAP2
+    // Retrieve outputs from FASTQC_ANALYSIS
+    fastqc_reports_zip = FASTQC_ANALYSIS.out.fastqc_reports_zip
+    fastqc_reports_html = FASTQC_ANALYSIS.out.fastqc_reports_html
 
-    // Step 6: Run Samtools/Bcftools
-    samtools_bcftools_results = minimap2_results
-        .combine(indexed_reference_ch)  // Pair BAM with FASTA
-        | SAMTOOLS_BCFTOOLS
+    // Run MultiQC analysis using FASTQC outputs
+    MULTIQC_ANALYSIS(fastqc_reports_html, fastqc_reports_zip)
 
-    // Step 7: Run Samtools Index (correct tuple structure)
-    samtools_index_results = samtools_bcftools_results
-        .map { tuple(it[0], it[2]) }  // Pass only sample_id and BAM
-        .combine(reference_ch.map { tuple(it) }) // Pass reference separately
-        | SAMTOOLS_INDEX 
+    // Retrieve MultiQC output
+    multiqc_html = MULTIQC_ANALYSIS.out.multiqc_html
 }
+
