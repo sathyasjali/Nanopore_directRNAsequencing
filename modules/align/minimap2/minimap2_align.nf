@@ -4,12 +4,14 @@ include { MINIMAP2 } from '../minimap2/main.nf'
 
 workflow MINIMAP2_ANALYSIS {
     take:
-    filtered_results_ch
+    nanofilt_out
     reference_ch
 
 main:
-    sam_output = filtered_results_ch.combine(reference_ch).map { tuple(it[0], it[1], it[2]) } | MINIMAP2
-    
+sam_output = nanofilt_out
+            .map { sample -> tuple(sample[0], sample[1]) }  // Ensure tuples
+            .combine(reference_ch)  // Use combine instead of cross
+            | MINIMAP2    
 emit:
     sam_output
 }

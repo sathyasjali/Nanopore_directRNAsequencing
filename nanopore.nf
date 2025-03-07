@@ -46,8 +46,5 @@ workflow {
     // MULTIQC_ANALYSIS2(fastqc_filtered_results.fastqc_filtered_reports_zip)
 
      // Run Minimap2 alignment on filtered FASTQ files
-    minimap2_results = nanofilt_out
-            .map { sample -> tuple(sample[0], sample[1]) }  // Ensure tuples
-            .combine(reference_ch)  // Use combine instead of cross
-            | MINIMAP2
+    minimap2_results = MINIMAP2_ANALYSIS(nanofilt_out, reference_ch)
     }
