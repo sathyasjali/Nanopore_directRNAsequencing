@@ -6,12 +6,14 @@ include { FASTQC } from './modules/qc/fastqc/main.nf'
 include { NANOFILT } from './modules/qc/nanofilt/main.nf'
 include { FASTQC2 } from './modules/qc/fastqc/main2.nf'
 include { MULTIQC } from './modules/qc/multiqc/main.nf'
+include { MULTIQC2 } from './modules/qc/multiqc/main2.nf'
 
 // Include subworkflows
 include { FASTQC_ANALYSIS } from './modules/qc/fastqc/fastqc_analysis.nf'
 include { NANOFILT_ANALYSIS } from './modules/qc/nanofilt/nanofilt_analysis.nf'
 include { FASTQC_ANALYSIS2 } from './modules/qc/fastqc/fastqc_analysis2.nf'
 include { MULTIQC_ANALYSIS } from './modules/qc/multiqc/multiqc_analysis.nf'
+include { MULTIQC_ANALYSIS2 } from './modules/qc/multiqc/multiqc_analysis2.nf'
 
 
 workflow {
@@ -36,5 +38,7 @@ workflow {
     nanofilt_out = NANOFILT_ANALYSIS.out.filtered_results
 
     // Run FASTQC again on filtered results
-    FASTQC_ANALYSIS2(nanofilt_out)
+    fastqc_filtered_results = FASTQC_ANALYSIS2(nanofilt_out)
+
+    MULTIQC_ANALYSIS2(fastqc_filtered_results.fastqc_filtered_reports_zip)
     }
