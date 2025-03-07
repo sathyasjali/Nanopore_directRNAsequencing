@@ -6,8 +6,8 @@ process FASTQC2 {
     tuple val(sample_id), path(fastq_file)
 
     output:
-    tuple val(sample_id), path("${sample_id}_fastqc_filtered.zip"), emit: fastqc_zip
-    tuple val(sample_id), path("${sample_id}_fastqc_filtered.html"), emit: fastqc_html
+    tuple val(sample_id), path("${sample_id}_fastqc_filtered.zip"), emit: fastqc_filtered_zip
+    tuple val(sample_id), path("${sample_id}_fastqc_filtered.html"), emit: fastqc_filtered_html
 
     script:
     """

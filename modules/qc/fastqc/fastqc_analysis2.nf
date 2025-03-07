@@ -5,9 +5,9 @@ workflow FASTQC_ANALYSIS2 {
     nanofilt_out
 
     main:
-    fastqc_results = nanofilt_out.map { tuple(it[0], it[1]) } | FASTQC2
+    nanofilt_out.map { tuple(it[0], it[1]) } | FASTQC2
 
     emit:
-    fastqc_filtered_reports_zip = FASTQC2.out.fastqc_zip
-    fastqc_filtered_reports_html = FASTQC2.out.fastqc_html
+    fastqc_filtered_reports_zip = FASTQC2.out.fastqc_filtered_zip
+    fastqc_filtered_reports_html = FASTQC2.out.fastqc_filtered_html
 }
