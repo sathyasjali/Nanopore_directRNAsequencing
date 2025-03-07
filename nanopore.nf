@@ -26,10 +26,15 @@ workflow {
     // Run FASTQC analysis
     fastqc_results = FASTQC_ANALYSIS(fastq_ch)
 
-    // Run MultiQC analysis using FASTQC outputs
-    MULTIQC_ANALYSIS(fastqc_reports_html, fastqc_reports_zip)
+    // Run MultiQC on FASTQC reports
+    multiqc_results = MULTIQC_ANALYSIS(fastqc_results.fastqc_reports_zip)
 
-    // Retrieve MultiQC output
-    multiqc_html = MULTIQC_ANALYSIS.out.multiqc_html
-}
+    // Run Nanofilt analysis
+    NANOFILT_ANALYSIS(fastq_ch)
 
+     // Retrieve outputs from NANOFILT_ANALYSIS
+    nanofilt_out = NANOFILT_ANALYSIS.out.filtered_results
+
+    // Run FASTQC again on filtered results
+    FASTQC_ANALYSIS2(nanofilt_out)
+    }
