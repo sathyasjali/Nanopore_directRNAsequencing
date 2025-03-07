@@ -3,10 +3,12 @@ nextflow.enable.dsl=2
 
 // Include modules
 include { FASTQC } from './modules/qc/fastqc/main.nf'
+include { NANOFILT } from './modules/qc/nanofilt/main.nf'
 include { MULTIQC } from './modules/qc/multiqc/main.nf'
 
 // Include subworkflows
 include { FASTQC_ANALYSIS } from './modules/qc/fastqc/fastqc_analysis.nf'
+include { NANOFILT_ANALYSIS } from './modules/qc/nanofilt/nanofilt_analysis.nf'
 include { MULTIQC_ANALYSIS } from './modules/qc/multiqc/multiqc_analysis.nf'
 
 
@@ -23,14 +25,20 @@ workflow {
     // Run FASTQC analysis
     FASTQC_ANALYSIS(fastq_ch)
 
-    // Retrieve outputs from FASTQC_ANALYSIS
+    // // Retrieve outputs from FASTQC_ANALYSIS
     fastqc_reports_zip = FASTQC_ANALYSIS.out.fastqc_reports_zip
     fastqc_reports_html = FASTQC_ANALYSIS.out.fastqc_reports_html
 
-    // Run MultiQC analysis using FASTQC outputs
-    MULTIQC_ANALYSIS(fastqc_reports_html, fastqc_reports_zip)
+    // Run Nanofilt analysis
+    NANOFILT_ANALYSIS(fastq_ch)
 
-    // Retrieve MultiQC output
-    multiqc_html = MULTIQC_ANALYSIS.out.multiqc_html
+    // Retrieve outputs from NANOFILT_ANALYSIS
+    nanofilt_out = NANOFILT_ANALYSIS.out.filtered_results
+
+    // // Run MultiQC analysis using FASTQC outputs
+    // MULTIQC_ANALYSIS(fastqc_reports_html, fastqc_reports_zip)
+
+    // // Retrieve MultiQC output
+    // multiqc_html = MULTIQC_ANALYSIS.out.multiqc_html
 }
 
