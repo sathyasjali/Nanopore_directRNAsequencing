@@ -44,7 +44,13 @@ workflow {
     fastqc_filtered_reports_zip = FASTQC_ANALYSIS2.out.fastqc_filtered_reports_zip
     fastqc_filtered_reports_html = FASTQC_ANALYSIS2.out.fastqc_filtered_reports_html
 
-    // Run MultiQC analysis using FASTQC outputs
-    // MULTIQC_ANALYSIS(fastqc_reports_html, fastqc_reports_zip)
+    // Merge FASTQC outputs for MultiQC
+    fastqc_reports = fastqc_reports_zip.mix(fastqc_filtered_reports_zip)
+
+    // Run MultiQC analysis
+    MULTIQC_ANALYSIS(fastqc_reports)
+
+    // Retrieve outputs from MULTIQC_ANALYSIS
+    multiqc_html = MULTIQC_ANALYSIS.out.multiqc_html
 }
 

@@ -5,15 +5,15 @@ process MULTIQC {
     publishDir "${params.out_dir}/multiqc", mode: 'copy'
     
     input:
-    path fastqc_html
-    path fastqc_zip
+    path fastqc_reports  // Accepts multiple files as a list
     
     output:
     path "multiqc_report.html", emit: multiqc_html
-    path "multiqc_data", emit: multiqc_data
     
     script:
     """
-    multiqc ${fastqc_html} ${fastqc_zip} -o ./
+    fastqc_reports.view { println "Files going into MultiQC: $it" }
+
+    // multiqc ${fastqc_reports} -o ./
     """
 }
