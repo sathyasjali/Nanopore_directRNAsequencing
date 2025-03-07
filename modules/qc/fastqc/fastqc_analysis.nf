@@ -6,8 +6,8 @@ workflow FASTQC_ANALYSIS {
 
     main:
     fastq_ch.map { tuple(it.getName().replaceAll(/\.fastq$/, ''), it) } | FASTQC
-
+    
     emit:
     fastqc_reports_zip = FASTQC.out.fastqc_zip
     fastqc_reports_html = FASTQC.out.fastqc_html
-}
+} 
