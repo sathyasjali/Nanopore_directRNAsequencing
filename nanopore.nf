@@ -11,6 +11,8 @@ include { MINIMAP2 } from './modules/align/minimap2/main.nf'
 include { SAMTOOLS } from './modules/align/samtools/main.nf'
 include { BCFTOOLS } from './modules/variant/bcftools/main.nf'
 include { EMBOSS} from './modules/alignment/emboss/main.nf'
+include { MOSDEPTH } from './modules/plots/mosdepth/main.nf'
+include { PLOTTING } from './modules/plots/plotting.nf'
 
 
 // Include subworkflows
@@ -23,7 +25,7 @@ include { MINIMAP2_ANALYSIS } from './modules/align/minimap2/minimap2_analysis.n
 include { SAMTOOLS_ANALYSIS } from './modules/align/samtools/samtools_analysis.nf'
 include { BCFTOOLS_ANALYSIS } from './modules/variant/bcftools/bcftools_analysis.nf'
 include { NEEDLE_ANALYSIS } from './modules/alignment/emboss/needle_analysis.nf'
-
+include { MOSDEPTH_ANALYSIS } from './modules/plots/mosdepth/mosdepth_analysis.nf'
 
 workflow {
     // Creating channels for inputs
@@ -63,4 +65,8 @@ workflow {
 
     // Run EMBOSS Needle alignment
     needle_results = NEEDLE_ANALYSIS(reference_ch, bcftools_results.consensus_sequence)
+
+
+    // Compute Genome Coverage using mosdepth
+   mosdepth_results = MOSDEPTH_ANALYSIS(samtools_results.sorted_bam.combine(samtools_results.bam_index))
     }
