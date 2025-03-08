@@ -8,6 +8,8 @@ include { FASTQC2 } from './modules/qc/fastqc/main2.nf'
 include { MULTIQC } from './modules/qc/multiqc/main.nf'
 include { MULTIQC2 } from './modules/qc/multiqc/main2.nf'
 include { MINIMAP2 } from './modules/align/minimap2/main.nf'
+include { SAMTOOLS } from './modules/align/samtools/main.nf'
+
 
 // Include subworkflows
 include { FASTQC_ANALYSIS } from './modules/qc/fastqc/fastqc_analysis.nf'
@@ -15,7 +17,8 @@ include { NANOFILT_ANALYSIS } from './modules/qc/nanofilt/nanofilt_analysis.nf'
 include { FASTQC_ANALYSIS2 } from './modules/qc/fastqc/fastqc_analysis2.nf'
 include { MULTIQC_ANALYSIS } from './modules/qc/multiqc/multiqc_analysis.nf'
 include { MULTIQC_ANALYSIS2 } from './modules/qc/multiqc/multiqc_analysis2.nf'
-include { MINIMAP2_ANALYSIS } from './modules/align/minimap2/minimap2_align.nf'
+include { MINIMAP2_ANALYSIS } from './modules/align/minimap2/minimap2_analysis.nf'
+include { SAMTOOLS_ANALYSIS } from './modules/align/samtools/samtools_analysis.nf'
 
 
 workflow {
@@ -24,9 +27,9 @@ workflow {
         error "No FASTQ files found in ${params.fastq_files}"
     }
 
-    reference_ch = Channel.fromPath(params.reference_dir + "/*.fa", checkIfExists: true).ifEmpty { 
-            error "No reference genome files found in ${params.reference_dir}"
-        }
+    reference_ch = Channel
+        .fromPath("${params.reference_dir}/*.fa", checkIfExists: true)
+        .ifEmpty { error "No reference genome files found in ${params.reference_dir}" }
 
     // Run FASTQC analysis
     fastqc_results = FASTQC_ANALYSIS(fastq_ch)
@@ -37,7 +40,7 @@ workflow {
     // Run Nanofilt analysis
     NANOFILT_ANALYSIS(fastq_ch)
 
-     // Retrieve outputs from NANOFILT_ANALYSIS
+    // Retrieve outputs from NANOFILT_ANALYSIS
     nanofilt_out = NANOFILT_ANALYSIS.out.filtered_results
 
     // Run FASTQC again on filtered results
@@ -45,6 +48,10 @@ workflow {
 
     // MULTIQC_ANALYSIS2(fastqc_filtered_results.fastqc_filtered_reports_zip)
 
-     // Run Minimap2 alignment on filtered FASTQ files
+    // Run Minimap2 alignment on filtered FASTQ files
     minimap2_results = MINIMAP2_ANALYSIS(nanofilt_out, reference_ch)
+
+    // Samtools Processing
+    samtools_results = SAMTOOLS_ANALYSIS(minimap2_results.sam_output, reference_ch)
+
     }
