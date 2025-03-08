@@ -10,7 +10,7 @@ include { MULTIQC2 } from './modules/qc/multiqc/main2.nf'
 include { MINIMAP2 } from './modules/align/minimap2/main.nf'
 include { SAMTOOLS } from './modules/align/samtools/main.nf'
 include { BCFTOOLS } from './modules/variant/bcftools/main.nf'
-//include { EMBOSS_NEEDLE } from './modules/alignment/needle/main.nf'
+include { EMBOSS} from './modules/alignment/emboss/main.nf'
 
 
 // Include subworkflows
@@ -22,7 +22,7 @@ include { MULTIQC_ANALYSIS2 } from './modules/qc/multiqc/multiqc_analysis2.nf'
 include { MINIMAP2_ANALYSIS } from './modules/align/minimap2/minimap2_analysis.nf'
 include { SAMTOOLS_ANALYSIS } from './modules/align/samtools/samtools_analysis.nf'
 include { BCFTOOLS_ANALYSIS } from './modules/variant/bcftools/bcftools_analysis.nf'
-//include { NEEDLE_ALIGNMENT } from './modules/alignment/needle/needle_analysis.nf'
+include { NEEDLE_ANALYSIS } from './modules/alignment/emboss/needle_analysis.nf'
 
 
 workflow {
@@ -61,4 +61,6 @@ workflow {
     // BCFtools Variant Calling
     bcftools_results = BCFTOOLS_ANALYSIS(samtools_results.sorted_bam, reference_ch)
 
+    // Run EMBOSS Needle alignment
+    needle_results = NEEDLE_ANALYSIS(reference_ch, bcftools_results.consensus_sequence)
     }
