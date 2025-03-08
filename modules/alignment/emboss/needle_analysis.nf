@@ -15,5 +15,7 @@ workflow NEEDLE_ANALYSIS {
             | EMBOSS
 
     emit:
-        needle_output = needle_results.map { result -> result[0], result[1] }  // Extracting the output tuple
+        needle_output = needle_results
+        // if you want to extract like tuple use below
+        // needle_outpu = needle_results.map { result -> result[0], result[1] }
 }
