@@ -63,10 +63,14 @@ workflow {
     // BCFtools Variant Calling
     bcftools_results = BCFTOOLS_ANALYSIS(samtools_results.sorted_bam, reference_ch)
 
+    // Create BAM index channel
+    bam_index_ch = samtools_results.bam_index
+
     // Run EMBOSS Needle alignment
     needle_results = NEEDLE_ANALYSIS(reference_ch, bcftools_results.consensus_sequence)
 
+    
+    // ✅ Pass correct input channels
+    mosdepth_results = MOSDEPTH_ANALYSIS(samtools_results.sorted_bam, samtools_results.bam_index)
 
-    // Compute Genome Coverage using mosdepth
-   mosdepth_results = MOSDEPTH_ANALYSIS(samtools_results.sorted_bam.combine(samtools_results.bam_index))
-    }
+}
