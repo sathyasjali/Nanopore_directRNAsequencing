@@ -9,12 +9,15 @@ workflow SAMTOOLS_ANALYSIS {
 
     main:
         processed_bam = sam_output
-            .combine(reference_ch) // Ensure proper pairing with reference
-            | SAMTOOLS  // Pass to SAMTOOLS process
+            .combine(reference_ch)
+            | SAMTOOLS
+
+    sorted_bam_ch = processed_bam.sorted_bam
+    bam_index_ch = processed_bam.bam_index
 
     emit:
         bam_output = processed_bam.bam_output
-        sorted_bam = processed_bam.sorted_bam
-        bam_index = processed_bam.bam_index
+        sorted_bam = sorted_bam_ch
+        bam_index = bam_index_ch
         reference_index = processed_bam.reference_index
 }
