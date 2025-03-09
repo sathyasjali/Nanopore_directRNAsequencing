@@ -12,7 +12,7 @@ include { SAMTOOLS } from './modules/align/samtools/main.nf'
 include { BCFTOOLS } from './modules/variant/bcftools/main.nf'
 include { EMBOSS} from './modules/alignment/emboss/main.nf'
 include { MOSDEPTH } from './modules/plots/mosdepth/main.nf'
-include { PLOTTING } from './modules/plots/plotting.nf'
+include { PLOTTING } from './modules/plots/main.nf'
 
 
 // Include subworkflows
@@ -26,6 +26,7 @@ include { SAMTOOLS_ANALYSIS } from './modules/align/samtools/samtools_analysis.n
 include { BCFTOOLS_ANALYSIS } from './modules/variant/bcftools/bcftools_analysis.nf'
 include { NEEDLE_ANALYSIS } from './modules/alignment/emboss/needle_analysis.nf'
 include { MOSDEPTH_ANALYSIS } from './modules/plots/mosdepth/mosdepth_analysis.nf'
+include { PLOTTING_ANALYSIS } from './modules/plots/plotting_analysis.nf'
 
 workflow {
     // Creating channels for inputs
@@ -72,5 +73,25 @@ workflow {
     
     // ✅ Pass correct input channels
     mosdepth_results = MOSDEPTH_ANALYSIS(samtools_results.sorted_bam, samtools_results.bam_index)
+    // ✅ Debugging: Print out the values of MOSDEPTH outputs
+    mosdepth_results.global_dist.view { it -> "DEBUG: global_dist -> ${it}" }
+    mosdepth_results.region_dist.view { it -> "DEBUG: region_dist -> ${it}" }
+    mosdepth_results.summary.view { it -> "DEBUG: summary -> ${it}" }
+    mosdepth_results.per_base_coverage.view { it -> "DEBUG: per_base_coverage -> ${it}" }
+    mosdepth_results.per_region_coverage.view { it -> "DEBUG: per_region_coverage -> ${it}" }
+    mosdepth_results.threshold_coverage.view { it -> "DEBUG: threshold_coverage -> ${it}" }
 
+    // ✅ Now pass results to PLOTTING_ANALYSIS
+    plot_results = PLOTTING_ANALYSIS(
+        mosdepth_results.global_dist.map { it[0] },  // Extract sample_id (First input)
+        mosdepth_results.global_dist.map { it[1] },  // Extract file path
+        mosdepth_results.region_dist.map { it[1] },
+        mosdepth_results.summary.map { it[1] },
+        mosdepth_results.per_base_coverage.map { it[1] },
+        mosdepth_results.per_region_coverage.map { it[1] },
+        mosdepth_results.threshold_coverage.map { it[1] }
+        )
+
+    // Use plot_results to save or view the plots
+    plot_results.view { it -> "Plotting results: ${it}" }
 }
