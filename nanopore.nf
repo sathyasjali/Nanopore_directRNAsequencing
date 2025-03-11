@@ -28,6 +28,7 @@ include { BCFTOOLS_ANALYSIS } from './modules/variant/bcftools/bcftools_analysis
 include { NEEDLE_ANALYSIS } from './modules/alignment/emboss/needle_analysis.nf'
 include { MOSDEPTH_ANALYSIS } from './modules/plots/mosdepth/mosdepth_analysis.nf'
 include { PLOTTING_ANALYSIS } from './modules/plots/plotting_analysis.nf'
+include { READLENGTH_HISTOGRAM_ANALYSIS } from './modules/plots/readlength_histogram/readlength_histogram_analysis.nf'
 
 workflow {
     // Creating channels for inputs
@@ -79,12 +80,8 @@ workflow {
         mosdepth_results.global_dist.map { it[1] }.collect() // Extract file path
         )
 
-    // Use plot_results to save or view the plots
-    plot_results.view { it -> "Plotting results: ${it}" }
-
     // Inside workflow block
-    histogram_plot = READLENGTH_HISTOGRAM(nanofilt_out)
+    histogram_plot = READLENGTH_HISTOGRAM_ANALYSIS(nanofilt_out)
 
-    histogram_plot.map { it -> "Read Length Histogram Generated: ${it}" }
-    //plot_results.map { "Plotting results: ${it}" } .println()
+    histogram_plot.map { it -> "Read Length Histogram Generated: ${it}" } .println()
 }

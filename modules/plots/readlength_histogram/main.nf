@@ -8,8 +8,8 @@ process READLENGTH_HISTOGRAM {
         tuple val(sample_id), path(filtered_fastq)
 
     output:
-        path "read_lengths.txt"
-        //path "read_length_histogram.png"
+    tuple val(sample_id), path("read_lengths.txt"), path("read_length_histogram.png")
+
 
     script:
     """
@@ -22,7 +22,12 @@ process READLENGTH_HISTOGRAM {
     echo "Processing FASTQ file: ${filtered_fastq}"
 
     awk '(NR%4==2){print length(\$1)}' "${filtered_fastq}" > read_lengths.txt
+
+    # Ensure required Python packages are installed
+    python3 -m pip install --no-cache-dir --upgrade pip
+    python3 -m pip install --no-cache-dir matplotlib pandas
+    
     # Run the Python script for plotting
-    #python3 ${params.script_dir}/readlength_histogram.py --input read_lengths.txt --output read_length_histogram.png
+    python3 ${params.script_dir} --input read_lengths.txt --output read_length_histogram.png
     """
 }
