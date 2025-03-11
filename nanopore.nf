@@ -16,6 +16,7 @@ include { PLOTTING } from './modules/plots/main.nf'
 include { READLENGTH_HISTOGRAM } from './modules/plots/readlength_histogram/main.nf'
 
 
+
 // Include subworkflows
 include { FASTQC_ANALYSIS } from './modules/qc/fastqc/fastqc_analysis.nf'
 include { NANOFILT_ANALYSIS } from './modules/qc/nanofilt/nanofilt_analysis.nf'
@@ -81,7 +82,7 @@ workflow {
         )
 
     // Inside workflow block
-    histogram_plot = READLENGTH_HISTOGRAM_ANALYSIS(nanofilt_out)
+    histogram_plots = READLENGTH_HISTOGRAM_ANALYSIS(nanofilt_out)
 
-    histogram_plot.map { it -> "Read Length Histogram Generated: ${it}" } .println()
+    histogram_plots.view { it -> "Read Length Histogram Generated: ${it}" } .println()
 }
