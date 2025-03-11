@@ -70,18 +70,12 @@ workflow {
     // Run EMBOSS Needle alignment
     needle_results = NEEDLE_ANALYSIS(reference_ch, bcftools_results.consensus_sequence)
 
-    
-    // ✅ Pass correct input channels
+    // Pass correct input channels
     mosdepth_results = MOSDEPTH_ANALYSIS(samtools_results.sorted_bam, samtools_results.bam_index)
-    // ✅ Now pass results to PLOTTING_ANALYSIS
+
+    // Now pass results to PLOTTING_ANALYSIS
     plot_results = PLOTTING_ANALYSIS(
-        mosdepth_results.global_dist.map { it[0] },  // Extract sample_id (First input)
-        mosdepth_results.global_dist.map { it[1] },  // Extract file path
-        mosdepth_results.region_dist.map { it[1] },
-        mosdepth_results.summary.map { it[1] },
-        mosdepth_results.per_base_coverage.map { it[1] },
-        mosdepth_results.per_region_coverage.map { it[1] },
-        mosdepth_results.threshold_coverage.map { it[1] },
+        mosdepth_results.global_dist.map { it[1] } // Extract file path
         )
 
     // Use plot_results to save or view the plots
