@@ -75,7 +75,7 @@ workflow {
 
     // Now pass results to PLOTTING_ANALYSIS
     plot_results = PLOTTING_ANALYSIS(
-        mosdepth_results.global_dist.map { it[1] } // Extract file path
+        mosdepth_results.global_dist.map { it[1] }.collect() // Extract file path
         )
 
     // Use plot_results to save or view the plots
