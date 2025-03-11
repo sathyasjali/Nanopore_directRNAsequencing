@@ -14,6 +14,7 @@ include { EMBOSS} from './modules/alignment/emboss/main.nf'
 include { MOSDEPTH } from './modules/plots/mosdepth/main.nf'
 include { PLOTTING } from './modules/plots/main.nf'
 include { READLENGTH_HISTOGRAM } from './modules/plots/readlength_histogram/main.nf'
+include { ERROR_PLOT } from './modules/plots/error_plot/main.nf'
 
 
 
@@ -30,6 +31,7 @@ include { NEEDLE_ANALYSIS } from './modules/alignment/emboss/needle_analysis.nf'
 include { MOSDEPTH_ANALYSIS } from './modules/plots/mosdepth/mosdepth_analysis.nf'
 include { PLOTTING_ANALYSIS } from './modules/plots/plotting_analysis.nf'
 include { READLENGTH_HISTOGRAM_ANALYSIS } from './modules/plots/readlength_histogram/readlength_histogram_analysis.nf'
+include { ERROR_PLOT_ANALYSIS } from './modules/plots/error_plot/error_plot_analysis.nf'
 
 workflow {
     // Creating channels for inputs
@@ -67,6 +69,9 @@ workflow {
     // BCFtools Variant Calling
     bcftools_results = BCFTOOLS_ANALYSIS(samtools_results.sorted_bam, reference_ch)
 
+     // Extract VCF output from BCFTOOLS
+    error_vcf_ch = bcftools_results.vcf_output
+
     // Create BAM index channel
     bam_index_ch = samtools_results.bam_index
 
@@ -85,4 +90,16 @@ workflow {
     histogram_plots = READLENGTH_HISTOGRAM_ANALYSIS(nanofilt_out)
 
     histogram_plots.view { it -> "Read Length Histogram Generated: ${it}" } .println()
+
+    // Extract Coverage File
+    coverage_ch = mosdepth_results.global_dist.map { it[1] }
+
+    // Ensure error_vcf_ch is properly formatted with sample_id and vcf_file
+    error_vcf_ch = error_vcf_ch.map { sample_id, vcf_file -> tuple(sample_id, vcf_file) }
+
+    // Run ERROR_PLOT_ANALYSIS with **two separate input channels**
+    error_plot_results = ERROR_PLOT_ANALYSIS(error_vcf_ch, coverage_ch)
+
+    // Display error plot outputs
+    error_plot_results.view { it -> "Error Plot Generated: ${it}" }
 }
