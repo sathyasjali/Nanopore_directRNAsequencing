@@ -2,8 +2,8 @@
 // PROCESS: Generate Genome Coverage Plots using Python
 
 process PLOTTING {
-    tag "$sample_id"
     container 'python:3.9-slim'
+    tag "$sample_id"
 
     input:
         val sample_id
@@ -19,7 +19,11 @@ process PLOTTING {
 
     script:
     """
+    # Copy the script into the working directory
+    cp ${params.parseScript} ./plot_script.py
     chmod +x plot_script.py
+
+    pip install --no-cache-dir pandas matplotlib
     python plot_script.py \
         --global_dist ${global_dist} \
         --region_dist ${region_dist} \

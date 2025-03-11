@@ -73,14 +73,6 @@ workflow {
     
     // ✅ Pass correct input channels
     mosdepth_results = MOSDEPTH_ANALYSIS(samtools_results.sorted_bam, samtools_results.bam_index)
-    // ✅ Debugging: Print out the values of MOSDEPTH outputs
-    mosdepth_results.global_dist.view { it -> "DEBUG: global_dist -> ${it}" }
-    mosdepth_results.region_dist.view { it -> "DEBUG: region_dist -> ${it}" }
-    mosdepth_results.summary.view { it -> "DEBUG: summary -> ${it}" }
-    mosdepth_results.per_base_coverage.view { it -> "DEBUG: per_base_coverage -> ${it}" }
-    mosdepth_results.per_region_coverage.view { it -> "DEBUG: per_region_coverage -> ${it}" }
-    mosdepth_results.threshold_coverage.view { it -> "DEBUG: threshold_coverage -> ${it}" }
-
     // ✅ Now pass results to PLOTTING_ANALYSIS
     plot_results = PLOTTING_ANALYSIS(
         mosdepth_results.global_dist.map { it[0] },  // Extract sample_id (First input)
@@ -89,7 +81,7 @@ workflow {
         mosdepth_results.summary.map { it[1] },
         mosdepth_results.per_base_coverage.map { it[1] },
         mosdepth_results.per_region_coverage.map { it[1] },
-        mosdepth_results.threshold_coverage.map { it[1] }
+        mosdepth_results.threshold_coverage.map { it[1] },
         )
 
     // Use plot_results to save or view the plots

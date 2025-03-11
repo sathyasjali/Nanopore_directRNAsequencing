@@ -1,37 +1,31 @@
-#!/usr/bin/env python3
-
+import argparse
+import os
 import sys
-import matplotlib.pyplot as plt
-import pandas as pd
 
-def plot_genome_coverage(input_files, output_file):
-    """Reads multiple mosdepth outputs and generates genome coverage plots."""
-    
-    plt.figure(figsize=(10, 6))
-    
-    for file in input_files:
-        try:
-            df = pd.read_csv(file, sep="\t", names=["Depth", "Fraction"])
-        except Exception as e:
-            print(f"Error reading coverage file {file}: {e}")
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Generate genome coverage plots.")
+    parser.add_argument("--global_dist", required=True, help="Path to global distribution file")
+    parser.add_argument("--region_dist", required=True, help="Path to region distribution file")
+    parser.add_argument("--summary", required=True, help="Path to summary file")
+    parser.add_argument("--per_base", required=True, help="Path to per-base coverage file")
+    parser.add_argument("--per_region", required=True, help="Path to per-region coverage file")
+    parser.add_argument("--threshold", required=True, help="Path to threshold coverage file")
+    parser.add_argument("--output", required=True, help="Output image file")
+
+    args = parser.parse_args()
+
+    # Debug: Print received arguments
+    print("Received arguments:")
+    for arg, value in vars(args).items():
+        print(f"{arg}: {value}")
+
+    # Check if files exist
+    for file_path in [args.global_dist, args.region_dist, args.summary, args.per_base, args.per_region, args.threshold]:
+        if not os.path.exists(file_path):
+            print(f"ERROR: Missing input file -> {file_path}", file=sys.stderr)
             sys.exit(1)
-        
-        plt.plot(df["Depth"], df["Fraction"], marker="o", linestyle="-", label=file)
 
-    plt.xlabel("Coverage Depth")
-    plt.ylabel("Fraction of Genome")
-    plt.title("Genome Coverage Distribution")
-    plt.legend()
-    plt.grid()
-    plt.savefig(output_file, dpi=300)
-    plt.close()
+    return args
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("Usage: python3 plot_script.py <output_file> <input_files...>")
-        sys.exit(1)
-
-    output_file = sys.argv[1]
-    input_files = sys.argv[2:]
-
-    plot_genome_coverage(input_files, output_file)
+    parse_arguments()
