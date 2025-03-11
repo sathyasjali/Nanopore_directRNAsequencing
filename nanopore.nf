@@ -13,6 +13,7 @@ include { BCFTOOLS } from './modules/variant/bcftools/main.nf'
 include { EMBOSS} from './modules/alignment/emboss/main.nf'
 include { MOSDEPTH } from './modules/plots/mosdepth/main.nf'
 include { PLOTTING } from './modules/plots/main.nf'
+include { READLENGTH_HISTOGRAM } from './modules/plots/readlength_histogram/main.nf'
 
 
 // Include subworkflows
@@ -80,4 +81,10 @@ workflow {
 
     // Use plot_results to save or view the plots
     plot_results.view { it -> "Plotting results: ${it}" }
+
+    // Inside workflow block
+    histogram_plot = READLENGTH_HISTOGRAM(nanofilt_out)
+
+    histogram_plot.map { it -> "Read Length Histogram Generated: ${it}" }
+    //plot_results.map { "Plotting results: ${it}" } .println()
 }
