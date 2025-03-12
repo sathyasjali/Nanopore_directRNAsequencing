@@ -32,6 +32,7 @@ include { MOSDEPTH_ANALYSIS } from './modules/plots/mosdepth/mosdepth_analysis.n
 include { PLOTTING_ANALYSIS } from './modules/plots/plotting_analysis.nf'
 include { READLENGTH_HISTOGRAM_ANALYSIS } from './modules/plots/readlength_histogram/readlength_histogram_analysis.nf'
 include { ERROR_PLOT_ANALYSIS } from './modules/plots/error_plot/error_plot_analysis.nf'
+include { MAPPING_STATS_ANALYSIS } from './modules/stats/mapping_stats_analysis.nf'
 
 workflow {
     // Creating channels for inputs
@@ -102,4 +103,21 @@ workflow {
 
     // Display error plot outputs
     error_plot_results.view { it -> "Error Plot Generated: ${it}" }
+
+    // Extract necessary channels
+    sam_ch = minimap2_results.map { id, sam_file -> tuple(id, sam_file) }
+    needle_ch = needle_results.map { id, needle_file -> tuple(id, needle_file) }
+
+    // Ensure correct pairing by sample ID using join()
+    combined_stats_ch = sam_ch.join(needle_ch)
+
+    // Debug: Verify the output before running the process
+    combined_stats_ch.view()
+    sam_ch.view()
+    needle_ch.view()
+    // Run mapping statistics analysis
+    mapping_stats_results = MAPPING_STATS_ANALYSIS(combined_stats_ch)
+
+    // Output mapping statistics results
+    mapping_stats_results.view { it -> "Mapping Stats Generated: ${it}" }
 }
