@@ -60,8 +60,9 @@ Modify the `params` section in the Nextflow script to adjust input file location
 ### How to run?
 1. Install Miniconda specific to your OS and then install NextFlow
 2. Install Docker specific to your OS
-3. Now cd to `Nanopore_workflow`
+3. Now `cd` to `Nanopore_directRNAsequencing`
 4. Then run the command `nextflow run nanopore.nf`
+5.  Nextflow skips re-executing completed steps and resumes execution from the point of failure or where changes occurred.`nextflow run nanopore.nf -resume`
 
 ## Output Files
 The pipeline generates multiple output files in the `results` directory:
@@ -72,6 +73,19 @@ The pipeline generates multiple output files in the `results` directory:
 - **Coverage Statistics (MOSDEPTH)** → `results/mosdepth/`
 - **Plots & Graphs (PLOTTING, HISTOGRAM, ERROR_PLOT)** → `results/plots/`
 - **Final Merged CSV Report (MAPPING_STATS_ANALYSIS)** → `results/mapping_stats.csv`
+- **HTML Report** → `results/report_summary.html`
+
+## Generate Report
+The pipeline includes a final step to generate a report summarizing all key outputs. To generate the report, run:
+```sh
+nextflow run nanopore.nf -profile docker --generate_report true
+```
+This will output a structured report file at `results/report_summary.html`, containing:
+- Summary of quality control metrics
+- Read filtering statistics
+- Alignment and variant calling results
+- Coverage analysis overview
+- Key plots and visualizations
 
 ## Docker Configuration
 The pipeline uses Docker containers for reproducibility. If running with Docker, ensure Docker is installed and running. The pipeline will automatically pull necessary images.

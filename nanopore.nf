@@ -33,6 +33,7 @@ include { PLOTTING_ANALYSIS } from './modules/plots/plotting_analysis.nf'
 include { READLENGTH_HISTOGRAM_ANALYSIS } from './modules/plots/readlength_histogram/readlength_histogram_analysis.nf'
 include { ERROR_PLOT_ANALYSIS } from './modules/plots/error_plot/error_plot_analysis.nf'
 include { MAPPING_STATS_ANALYSIS } from './modules/stats/mapping_stats_analysis.nf'
+include { MERGE_CSV_FILES } from './modules/stats/merge_csv_files.nf'
 
 workflow {
     // Creating channels for inputs
@@ -120,4 +121,11 @@ workflow {
 
     // Output mapping statistics results
     mapping_stats_results.view { it -> "Mapping Stats Generated: ${it}" }
+
+
+    // Collect all generated CSVs
+    merged_csv = MERGE_CSV_FILES(mapping_stats_results)
+
+    // Save final output
+    merged_csv.view()
 }
