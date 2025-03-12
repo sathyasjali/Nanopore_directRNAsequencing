@@ -2,6 +2,7 @@ import pysam
 import argparse
 import pandas as pd
 import re
+import glob
 
 def parse_sam(sam_file):
     """Parses the SAM file to extract alignment statistics."""
@@ -10,12 +11,13 @@ def parse_sam(sam_file):
     except Exception as e:
         print(f"❌ Error opening SAM file: {sam_file} - {str(e)}")
         return {
+            "Sample": sam_file,
             "Total Reads": 0,
             "Mapped Reads": 0,
             "Unmapped Reads": 0,
             "Mapping Percentage": 0.0
         }
-
+    
     total_reads = 0
     mapped_reads = 0
     unmapped_reads = 0
@@ -26,10 +28,11 @@ def parse_sam(sam_file):
             unmapped_reads += 1
         else:
             mapped_reads += 1
-
+    
     mapping_percentage = (mapped_reads / total_reads) * 100 if total_reads > 0 else 0.0
 
     return {
+        "Sample": sam_file,
         "Total Reads": total_reads,
         "Mapped Reads": mapped_reads,
         "Unmapped Reads": unmapped_reads,
@@ -74,6 +77,14 @@ def main():
     # Save to CSV
     df.to_csv(args.output, index=False)
     print(f"✅ Mapping Statistics saved to: {args.output}")
+
+    # Combine all generated CSV files into one
+    csv_files = glob.glob("*_mapping_stats.csv")
+    if len(csv_files) > 1:
+        combined_df_list = [pd.read_csv(f) for f in csv_files]
+        combined_df = pd.concat(combined_df_list, ignore_index=True)
+        combined_df.to_csv("combined_mapping_stats.csv", index=False)
+        print("✅ Combined Mapping Statistics saved to: combined_mapping_stats.csv")
 
 if __name__ == "__main__":
     main()

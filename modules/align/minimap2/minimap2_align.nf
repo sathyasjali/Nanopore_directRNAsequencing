@@ -7,11 +7,11 @@ workflow MINIMAP2_ANALYSIS {
     nanofilt_out
     reference_ch
 
-main:
-sam_output = nanofilt_out
-            .map { sample -> tuple(sample[0], sample[1]) }  // Ensure tuples
-            .combine(reference_ch)  // Use combine instead of cross
-            | MINIMAP2    
-emit:
-    sam_output
+    main:
+    sam_output = nanofilt_out
+                .map { sample -> tuple(sample[0], sample[1]) }  // Ensure tuples
+                .combine(reference_ch)  // Use combine instead of cross
+                | MINIMAP2    
+    emit:
+        sam_output
 }

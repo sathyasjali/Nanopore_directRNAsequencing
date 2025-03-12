@@ -7,7 +7,6 @@ workflow NANOFILT_ANALYSIS {
     main:
     filtered_results = fastq_ch.map { tuple(it.baseName, it) } | NANOFILT
 
-
     emit:
     filtered_results
 
