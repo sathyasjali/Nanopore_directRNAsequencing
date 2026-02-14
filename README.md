@@ -151,6 +151,9 @@ Nextflow Workflow
    - Use `nextflow info` to verify module availability
    - Ensure required containers are accessible
 
+4. **common errors occured when building this pipeline**
+   - `fastqc_reports_zip.collect { it[1] } | MULTIQC` This ensures MultiQC gets only file paths `it[1]`, ignoring the sample ID
+
 
 # Resources
 - Read Nextflow instructions [here](https://www.nextflow.io/).
@@ -162,3 +165,4 @@ Nextflow Workflow
 
 ## Citation
 Begik O*, Lucas MC*, Ramirez JM, Milenkovic I, Cruciani S, Vieira HGS, Medina R, Liu H, Sas-Chen A, Mattick JS, Schwartz S and Novoa EM. Decoding ribosomal RNA modification dynamics at single molecule resolution. bioRxiv 2020. doi: https://doi.org/10.1101/2020.07.06.189969
+
