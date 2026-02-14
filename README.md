@@ -54,15 +54,36 @@ Modify the `params` section in the Nextflow script to adjust input file location
 
 
 ### Note
-- Modify the `nextflow.config` file for Linux systems by changing the executor to 'local' and setting the appropriate paths for your environment. For example:
-- Modify the `nextflow.config` file for linux system
+- Modify the `nextflow.config` file for Linux systems by changing the executor to 'local' and setting the appropriate paths for your environment.
+
+### Installation
+1. Install [Java 11+](https://www.oracle.com/java/technologies/downloads/)
+2. Install [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
+3. Install Nextflow:
+   ```sh
+   conda install -c bioconda nextflow
+   ```
+   Or via curl:
+   ```sh
+   curl -s https://get.nextflow.io | bash
+   ```
+4. Install [Docker](https://docs.docker.com/get-docker/) and ensure the Docker daemon is running
+5. Clone this repository:
+   ```sh
+   git clone https://github.com/sathyasjali/Nanopore_directRNAsequencing.git
+   cd Nanopore_directRNAsequencing
+   ```
 
 ### How to run?
-1. Install Miniconda specific to your OS and then install NextFlow
-2. Install Docker specific to your OS
-3. Now `cd` to `Nanopore_directRNAsequencing`
-4. Then run the command `nextflow run nanopore.nf`
-5.  Nextflow skips re-executing completed steps and resumes execution from the point of failure or where changes occurred.`nextflow run nanopore.nf -resume`
+1. Place your FASTQ files in `data/reads/` and reference genome in `data/reference/`
+2. Run the pipeline:
+   ```sh
+   nextflow run nanopore.nf
+   ```
+3. To resume from a previous run (skips completed steps):
+   ```sh
+   nextflow run nanopore.nf -resume
+   ```
 
 ## Output Files
 The pipeline generates multiple output files in the `results` directory:
@@ -155,14 +176,13 @@ Nextflow Workflow
    - `fastqc_reports_zip.collect { it[1] } | MULTIQC` This ensures MultiQC gets only file paths `it[1]`, ignoring the sample ID
 
 
-# Resources
-- Read Nextflow instructions [here](https://www.nextflow.io/).
-- Test fastq data taken from GitHub repo [here](https://github.com/novoalab/Best_Practices_dRNAseq_analysis/blob/master/README.md).
-- Test fastq data taken from [GitHub repo](https://github.com/novoalab/Best_Practices_dRNAseq_analysis/blob/master/README.md)
-- Docker containers used from https://seqera.io/containers/
-- Biocontainers available at [Quay.io](https://quay.io/).
+## Resources
+- [Nextflow Documentation](https://www.nextflow.io/)
+- Test FASTQ data from [Novoa Lab - Best Practices for dRNAseq Analysis](https://github.com/novoalab/Best_Practices_dRNAseq_analysis)
+- Docker containers from [Seqera Containers](https://seqera.io/containers/)
+- Biocontainers available at [Quay.io](https://quay.io/)
 
-
-## Citation
-Begik O*, Lucas MC*, Ramirez JM, Milenkovic I, Cruciani S, Vieira HGS, Medina R, Liu H, Sas-Chen A, Mattick JS, Schwartz S and Novoa EM. Decoding ribosomal RNA modification dynamics at single molecule resolution. bioRxiv 2020. doi: https://doi.org/10.1101/2020.07.06.189969
+## Citations
+- Di Tommaso, P., Chatzou, M., Floden, E.W. et al. Nextflow enables reproducible computational workflows. *Nat Biotechnol* 35, 316-319 (2017). doi: [10.1038/nbt.3820](https://doi.org/10.1038/nbt.3820)
+- Begik O\*, Lucas MC\*, Pryszcz LP, Ramirez JM, Medina R, Milenkovic I, Cruciani S, Liu H, Vieira HGS, Sas-Chen A, Mattick JS, Schwartz S and Novoa EM. Quantitative profiling of pseudouridylation dynamics in native RNAs with nanopore sequencing. *Nat Biotechnol* 39, 1278-1291 (2021). doi: [10.1038/s41587-021-00915-6](https://doi.org/10.1038/s41587-021-00915-6)
 

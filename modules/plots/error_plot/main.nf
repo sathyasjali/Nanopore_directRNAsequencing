@@ -13,6 +13,8 @@ process ERROR_PLOT {
 
     """
     # Ensure required Python packages are installed
+    python3 -m pip install --no-cache-dir matplotlib pandas
+
     # Run the Python script to generate the error plot
     python3 ${params.error_script} \\
         --vcf ${vcf_file} \\
